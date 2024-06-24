@@ -1,0 +1,64 @@
+services:
+  aryanattapt-nginx:
+    image: nginx:latest
+    container_name: aryanattapt-nginx
+    restart: always
+    volumes:
+      - ~/../apps/nginx/html:/usr/share/nginx/html
+      - ~/../apps/nginx/conf:/etc/nginx/conf.d
+      - ~/../apps/nginx/sites-enabled:/etc/nginx/sites-enabled
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      aryanattapt-network:
+
+  aryanattapt-krakend:
+    image: devopsfaith/krakend
+    container_name: aryanattapt-krakend
+    command: run -d -c /etc/krakend/krakend.json
+    restart: always
+    ports:
+      - "8000:8080"
+    volumes:
+      - ~/../apps/krakend:/etc/krakend
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      aryanattapt-network:
+
+  aryanattapt-krakend-designer:
+    image: devopsfaith/krakendesigner
+    container_name: aryanattapt-krakend-designer
+    restart: always
+    ports:
+      - "8001:80"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      aryanattapt-network:
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

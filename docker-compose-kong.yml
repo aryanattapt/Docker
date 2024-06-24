@@ -1,0 +1,109 @@
+services:
+  aryanattapt-nginx:
+    image: nginx:latest
+    container_name: aryanattapt-nginx
+    restart: always
+    volumes:
+      - ~/../apps/nginx/html:/usr/share/nginx/html
+      - ~/../apps/nginx/conf:/etc/nginx/conf.d
+      - ~/../apps/nginx/sites-enabled:/etc/nginx/sites-enabled
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+  aryanattapt-kongdb:
+    image: postgres:9.6
+    container_name: aryanattapt-kongdb
+    environment:
+      POSTGRES_DB: kong
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: kong
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    restart: always
+    networks:
+      - aryanattapt-network
+      
+  aryanattapt-kongmigrations:
+    image: kong/kong-gateway:latest
+    command: kong migrations bootstrap
+    container_name: aryanattapt-kongmigrations
+    depends_on:
+      - aryanattapt-kongdb
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: aryanattapt-kongdb
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+    restart: on-failure
+    networks:
+      - aryanattapt-network
+      
+  aryanattapt-konggateway:
+    image: kong/kong-gateway:latest
+    container_name: aryanattapt-konggateway
+    restart: always
+    depends_on:
+      aryanattapt-kongdb:
+        condition: service_healthy
+    environment:
+      KONG_ADMIN_GUI_URL: "http://XXX.XXX.XXX.XXX:8002/manager"
+      KONG_ADMIN_GUI_PATH: "/"
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: aryanattapt-kongdb
+      KONG_PG_DATABASE: kong
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: kong
+      KONG_PROXY_LISTEN: 0.0.0.0:8000, 0.0.0.0:8443 ssl
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    ports:
+      - "8000-8001:8000-8001/tcp"
+      - "8443:8443"
+      - "8444:8444"
+      - "8002:8002"
+    networks:
+      - aryanattapt-network
+      
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true
+    
+#docker network create -d bridge aryanattapt-network

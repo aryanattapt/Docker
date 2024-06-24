@@ -1,0 +1,23 @@
+services:
+  aryanattapt-redis:
+    image: redis:latest
+    container_name: aryanattapt-redis
+    ports:
+      - 6379:6379
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true
+    
+#docker network create -d bridge aryanattapt-network
