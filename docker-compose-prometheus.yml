@@ -1,0 +1,54 @@
+services:
+  aryanattapt-prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    container_name: aryanattapt-prometheus
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z -v localhost 9090"]
+    volumes:
+      - ~/../apps/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+  aryanattapt-grafana:
+      image: grafana/grafana
+      ports:
+        - "3000:3000"
+        - "9091:9091"
+        - "9092:9092"
+      container_name: aryanattapt-grafana
+      restart: always
+      healthcheck:
+          test: ["CMD-SHELL", "nc -z -v localhost 9091"]
+      volumes:
+        - ~/../apps/grafana/grafana.ini:/etc/grafana/grafana.ini
+        - ~/../apps/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+        - grafana-storage:/var/lib/grafana
+      deploy:
+        resources:
+          limits:
+            cpus: '0.1'
+            memory: 100M
+          reservations:
+            cpus: '0.1'
+            memory: 16M
+      networks:
+        - aryanattapt-network
+
+volumes:
+  grafana-storage:
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true
