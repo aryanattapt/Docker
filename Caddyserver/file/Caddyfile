@@ -1,0 +1,15 @@
+future.aryanattapt.my.id {
+    file_server
+
+    # Increase max body size to 128M (default is 100MB)
+    header {
+        Max-Body-Size 128MB
+    }
+    
+    # Forward /api to the backend service (after rewriting the URL)
+    #reverse_proxy /api/* http://qanodejsapi:30000
+
+    handle_path /api* {
+		  reverse_proxy http://qanodejsapi:30000
+	  }
+}

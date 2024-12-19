@@ -1,14 +1,21 @@
 services:
-  aryanattapt-redis:
-    image: redis:latest
-    container_name: aryanattapt-redis
+  aryanattapt-rabbitmq:
+    image: rabbitmq:management
+    container_name: aryanattapt-rabbitmq
+    restart: always
     ports:
-      - 6379:6379
+      - "10000:5672"    # RabbitMQ default port for client communication
+      - "10001:15672"  # RabbitMQ management web UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin    # Default username
+      - RABBITMQ_DEFAULT_PASS=admin    # Default password
+    volumes:
+      - ~/../apps/rabbitmq:/var/lib/rabbitmq  # Persist RabbitMQ data across container restarts
     deploy:
       resources:
         limits:
-          cpus: '0.5'
-          memory: 512M
+          cpus: '1'
+          memory: 2G
         reservations:
           cpus: '0.1'
           memory: 100M

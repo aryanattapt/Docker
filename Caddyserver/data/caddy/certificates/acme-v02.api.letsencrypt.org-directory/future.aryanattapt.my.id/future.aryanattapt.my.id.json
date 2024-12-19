@@ -1,0 +1,18 @@
+{
+	"sans": [
+		"future.aryanattapt.my.id"
+	],
+	"issuer_data": {
+		"url": "https://acme-v02.api.letsencrypt.org/acme/cert/03554e3f75d2485eea5094f0df3af0222e27",
+		"ca": "https://acme-v02.api.letsencrypt.org/directory",
+		"renewal_info": {
+			"suggestedWindow": {
+				"start": "2025-02-13T11:33:57Z",
+				"end": "2025-02-15T11:33:57Z"
+			},
+			"_uniqueIdentifier": "kydGmAOpUWiOmNbEQkjbI79YlNI.A1VOP3XSSF7qUJTw3zrwIi4n",
+			"_retryAfter": "2024-12-19T19:56:30.747046388Z",
+			"_selectedTime": "2025-02-14T20:51:13Z"
+		}
+	}
+}

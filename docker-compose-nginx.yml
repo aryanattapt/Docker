@@ -1,0 +1,27 @@
+services:
+  aryanattapt-nginx:
+    image: nginx:latest
+    container_name: aryanattapt-nginx
+    restart: always
+    volumes:
+      - ~/../apps/nginx/html:/usr/share/nginx/html
+      - ~/../apps/nginx/conf:/etc/nginx/conf.d
+      - ~/../apps/nginx/sites-enabled:/etc/nginx/sites-enabled
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

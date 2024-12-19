@@ -1,0 +1,54 @@
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+      - "20000:2181"
+    networks:
+      - kafka-network
+    volumes:
+      - ~/zookeeper-logs:/tmp/zookeeper    # Mount local Zookeeper log directory
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOOKEEPER_SYNC_LIMIT: 2
+    mem_limit: 512m
+    mem_reservation: 256m
+    container_name: zookeeper
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "20001:9093"
+      - "20002:9092"
+    networks:
+      - kafka-network
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ADVERTISED_LISTENER: 'EXTERNAL://localhost:20002'
+      KAFKA_LISTENER_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:20000
+    volumes:
+      - ~/kafka-config/server.properties:/opt/kafka/config/server.properties  # Mount custom server.properties file
+      - ~/kafka-logs:/var/lib/kafka/logs     # Mount local Kafka log directory
+    mem_limit: 2g
+    mem_reservation: 1g
+    container_name: kafka
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    ports:
+      - "20003:9000"
+    networks:
+      - kafka-network
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKERCONNECT: kafka:20001
+    restart: always
+    mem_limit: 512m
+    container_name: kafdrop
+
+networks:
+  kafka-network:
+    driver: bridge

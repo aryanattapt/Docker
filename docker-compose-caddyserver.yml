@@ -1,0 +1,27 @@
+services:
+  aryanattapt-caddyserver:
+    image: caddy:latest
+    container_name: aryanattapt-caddyserver
+    volumes:
+      - ~/../apps/Caddyserver/file/Caddyfile:/etc/caddy/Caddyfile
+      - ~/../apps/Caddyserver/data:/data
+      - ~/../apps/Caddyserver/config:/config
+      - ~/../apps/Caddyserver/site:/site
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - CADDY_DOCKER_CLEANUP=false
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+    networks:
+       - aryanattapt-network
+        
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true
