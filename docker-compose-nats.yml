@@ -1,0 +1,38 @@
+services:
+  aryanattapt-nats:
+    image: nats:latest
+    container_name: aryanattapt-nats
+    ports:
+      - "10000:4222"    # Main NATS port for clients
+      - "10001:6222"    # Cluster port (optional for clustering)
+      - "10002:8222"    # HTTP monitoring port
+    environment:
+      - NATS_SERVER_NAME=aryanattapt-nats  # Optional, can be passed through the command instead
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    command: [
+      "-m", "8222",                    # Enable monitoring on port 8222
+      "--jetstream",                   # Enable JetStream
+      "--store", "/data/nats-store",    # Store JetStream data in the /data/nats-store directory
+      "-N", "aryanattapt-nats"          # Set server name (this can be added here instead of environment variable)
+    ]
+    volumes:
+      - nats_data:/data                # Volume to persist NATS and JetStream data
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true
+
+volumes:
+  nats_data:
+    driver: local

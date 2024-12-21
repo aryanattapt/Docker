@@ -67,9 +67,18 @@ services:
       - 50004:9300
     environment:
       - discovery.type=single-node
-      - ELASTIC_USERNAME=elasticsearch
-      - ELASTIC_PASSWORD=elasticsearch
+      - cluster.name=aryanattapt_cluster
       - ES_JAVA_OPTS=-Xms512m -Xmx2g
+      - xpack.security.enabled=false  # Disable security, including HTTPS
+      - xpack.security.transport.ssl.enabled=false  # Disable SSL for internal transport
+
+      # - ELASTIC_USERNAME=elasticsearch
+      # - ELASTIC_PASSWORD=elasticsearch
+      # - xpack.security.enabled=true  # Enable security (authentication and authorization)
+      # - xpack.security.transport.ssl.enabled=true  # Enable SSL/TLS for internal communication
+      # - xpack.security.http.ssl.enabled=true  # Enable SSL/TLS for HTTP layer (REST API)
+      # - xpack.security.http.ssl.keystore.path=/path/to/keystore  # Path to SSL keystore
+      # - xpack.security.http.ssl.truststore.path=/path/to/truststore  # Path to SSL truststore
     deploy:
       resources:
         limits:
