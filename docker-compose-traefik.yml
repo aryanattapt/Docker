@@ -1,0 +1,46 @@
+version: '3.7'
+
+services:
+  aryanattapt-traefik:
+    image: traefik:latest  # Use the latest stable Traefik version
+    container_name: aryanattapt-traefik
+    restart: always
+    command:
+      - "--api.insecure=true"                        # Enable the dashboard (insecure)
+      - "--api.dashboard=true"                       # Enable the dashboard API
+      - "--providers.docker=true"                    # Enable Docker provider for dynamic service discovery
+      - "--metrics.prometheus=true"                  # Enable Prometheus metrics
+      - "--metrics.prometheus.entryPoint=traefik"    # Define Prometheus entry point
+      - "--log.level=DEBUG"                          # Set log level
+      - "--log.filePath=/var/log/traefik.log"        # Log to file (optional)
+
+    ports:
+      - "80:80"    # HTTP
+      - "443:443"  # HTTPS
+      - "10002:8080" # Dashboard (accessible on port 8080)
+      - "10003:9100"  # Prometheus metrics (default Prometheus port)
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 300M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+    volumes:
+      - "~/../apps/traefik/traefik.yml:/etc/traefik/traefik.yml"  # Mount your static config
+      - "/var/run/docker.sock:/var/run/docker.sock" # For Traefik to communicate with Docker API
+      - "~/../apps/traefik/log:/var/log"  # Mount a local log directory for Traefik logs (if logging to a file)
+
+    networks:
+      - aryanattapt-network
+
+    labels:
+      - "traefik.enable=true"  # Enable Traefik for this container
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

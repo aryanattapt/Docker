@@ -1,0 +1,64 @@
+# Static configuration for Traefik
+
+# Enable the API and dashboard (insecure)
+api:
+  insecure: true      # Allows access to the dashboard via HTTP
+  dashboard: true     # Enables the Traefik dashboard
+
+# Enable Docker provider for dynamic configuration
+providers:
+  docker:
+    exposedByDefault: false  # Don't expose services by default unless specifically defined
+
+# Entry points for HTTP and HTTPS
+entryPoints:
+  web:
+    address: ":80"         # HTTP
+  web-secure:
+    address: ":443"        # HTTPS
+
+# Enable logging
+log:
+  level: DEBUG               # Set log level (can be DEBUG, INFO, WARN, ERROR)
+  filePath: "/var/log/traefik.log"  # Optional: store logs in a file (default: stdout)
+
+# Enable metrics (Prometheus)
+metrics:
+  prometheus:
+    entryPoint: "traefik"  # Expose Prometheus metrics on this entry point
+    addEntryPointsLabels: true  # Include entry point labels in metrics
+
+# Enable Let's Encrypt if you want HTTPS with ACME
+certificatesResolvers:
+  http:
+    acme:
+      email: "aryanatta@gmail.com"
+      storage: "/acme.json"
+      httpChallenge:
+        entryPoint: "web"  # Use HTTP challenge for Let's Encrypt
+
+# Optional: Redirect HTTP to HTTPS
+middlewares:
+  redirect-to-https:
+    redirectScheme:
+      scheme: https
+      permanent: true
+
+# Define routing for the `qanodejs` service
+http:
+  routers:
+    qanodejs-route:
+      rule: "Host(`api.aryanattapt.my.id`) && PathPrefix(`/test`)"  # Define rule to route traffic
+      service: qanodejs-service  # Service name (you’ll define the service below)
+      entryPoints:
+        - web
+        - web-secure
+      middlewares:
+        - redirect-to-https  # Optional: Redirect HTTP to HTTPS (if required)
+
+  services:
+    qanodejs-service:
+      loadBalancer:
+        servers:
+          - url: "http://qanodejsapi:3000"  # The address of the `qanodejs` container inside Docker (use the container name if in the same network)
+
