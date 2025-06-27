@@ -1,0 +1,26 @@
+services:
+  aryanattapt-dockge:
+    image: louislam/dockge:1
+    container_name: aryanattapt-dockge
+    ports:
+      - "50019:5001"
+    volumes:
+      - ~/../var/run/docker.sock:/var/run/docker.sock
+      - ~/../opt/stacks:/opt/stacks
+      - ~/../apps/dockge:/app/data
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 384M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

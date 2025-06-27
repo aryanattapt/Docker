@@ -1,0 +1,25 @@
+services:
+  aryanattapt-portainer:
+    image: portainer/portainer-ce:latest
+    container_name: aryanattapt-portainer
+    ports:
+      - "50019:9000"
+    volumes:
+      - ~/../var/run/docker.sock:/var/run/docker.sock
+      - ~/../apps/portainer:/data
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 384M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

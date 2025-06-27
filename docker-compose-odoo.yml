@@ -1,0 +1,77 @@
+services:
+  aryanattapt-odoo:
+    image: odoo:latest  # Use the latest Odoo image
+    container_name: aryanattapt-odoo
+    restart: always
+    ports:
+      - "50015:8069"
+      - "50016:8071"
+      - "50017:8072"
+    depends_on:
+      - aryanattapt-odoo-postgresql
+      - aryanattapt-odoo-redis
+    volumes:
+      - ~/../apps/odoo/data:/var/lib/odoo
+      - ~/../apps/odoo/addons:/mnt/extra-addons
+    environment:
+      - REDIS_HOST=aryanattapt-odoo-redis
+      - HOST=aryanattapt-odoo-postgresql
+      - PORT=5432
+      - USER=postgre
+      - PASSWORD=postgre
+    command: >
+      odoo -d aryanattapt --db_host=aryanattapt-odoo-postgresql --db_port=5432 --db_user=postgre --db_password=postgre -i base --without-demo=all
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+  aryanattapt-odoo-postgresql:
+    image: postgres:latest  # Latest version of PostgreSQL
+    container_name: aryanattapt-odoo-postgresql
+    restart: always
+    ports:
+      - "50013:5432"  # Expose PostgreSQL on port 50001
+    volumes:
+      - ~/../apps/postgresql/odoo:/var/lib/postgresql/data  # Mount volume for persistence
+    environment:
+      POSTGRES_PASSWORD: postgre
+      POSTGRES_USER: postgre
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 100M
+    networks:
+      - aryanattapt-network
+
+  aryanattapt-odoo-redis:
+    image: redis:latest  # Latest Redis image
+    container_name: aryanattapt-odoo-redis
+    restart: always
+    ports:
+      - "50014:6379"  # Expose Redis on port 50002
+    deploy:
+      resources:
+        limits:
+          cpus: '0.1'
+          memory: 64M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

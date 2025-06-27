@@ -1,0 +1,25 @@
+services:
+  aryanattapt-glances:
+    image: nicolargo/glances:latest-full
+    container_name: aryanattapt-glances
+    ports:
+      - "50020:61208"
+    volumes:
+      - ~/../var/run/docker.sock:/var/run/docker.sock
+    restart: always
+    command: glances -w
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

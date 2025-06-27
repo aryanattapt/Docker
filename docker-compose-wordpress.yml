@@ -1,0 +1,53 @@
+services:
+  aryanattapt-wordpress:
+    image: wordpress:latest
+    container_name: aryanattapt-wordpress
+    restart: always
+    ports:
+      - "40000:80"
+    environment:
+      WORDPRESS_DB_HOST: aryanattapt-wordpress-db
+      WORDPRESS_DB_NAME: wp_database
+      WORDPRESS_DB_USER: wp_user
+      WORDPRESS_DB_PASSWORD: wp_password
+    volumes:
+      - ~/../apps/wordpress/data:/var/www/html
+    networks:
+      - aryanattapt-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+
+  aryanattapt-wordpress-db:
+    image: mysql:5.7
+    restart: always
+    container_name: aryanattapt-wordpress-db
+    environment:
+      MYSQL_ROOT_PASSWORD: wp_password
+      MYSQL_DATABASE: wp_database
+      MYSQL_USER: wp_user
+      MYSQL_PASSWORD: wp_password
+    ports:
+      - "50006:3306"
+    volumes:
+      - ~/../apps/wordpress/mysql:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true

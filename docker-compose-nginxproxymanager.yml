@@ -1,0 +1,29 @@
+services:
+  aryanattapt-nginxproxymanager:
+    image: jc21/nginx-proxy-manager:latest
+    container_name: aryanattapt-nginxproxymanager
+    restart: always
+    ports:
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+      - "10000:81"  # Admin panel
+    environment:
+      DB_SQLITE_FILE: "/data/database.sqlite"  # Use SQLite database file (default option)
+    volumes:
+      - ~/../apps/nginxproxymanager/data:/data # Persists data across restarts
+      - ~/../apps/nginxproxymanager/letsencrypt:/etc/letsencrypt # Mount Let's Encrypt certificates directory
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.1'
+          memory: 16M
+    networks:
+      - aryanattapt-network
+
+networks:
+  aryanattapt-network:
+    name: aryanattapt-network
+    external: true
